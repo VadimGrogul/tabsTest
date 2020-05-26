@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 900px;
+            padding: 50px;
+            margin: 50px auto;
+            border: 1px solid silver;
+            text-align: center;
+        }
+
+        #pageNumber {
+            font-size: 90px;
+            margin-bottom: 30px;
+        }
+
+        .countTabs {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        #openBtn, #closeBtn {
+            background: cornflowerblue;
+            border: none;
+            border-radius: 3px;
+            padding: 5px;
+            font-size: 22px;
+            color: #ffffff;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="pageNumber"></div>
+        <div class="countTabs">Колличество открытых вкладок: <span id="countTabs"></span></div>
+        <button id="openBtn">Open</button>
+        <button id="closeBtn">Close</button>
+    </div>
+
+    <script type="text/javascript">
+        window.onload = function() {
+            // DOM Elements
+            let openBtn = document.getElementById('openBtn');
+            let closeBtn = document.getElementById('closeBtn');
+            let countTabs = document.getElementById('countTabs');
+            let numberBlock = document.getElementById('pageNumber');
+
+            //   ----------------------------
+            //  set page/tab personal id's
+            let tabId = Math.random();
+            let pageNumber = Math.floor(Math.random() * 101);
+
+            let storage = window.localStorage;
+
+            let keys = Object.keys(storage)
+
+            //  Check if pageId or tabId are exist in localStorage
+           if (keys.length) {
+               for (let i = 0; i < keys.length; i++) {
+                   if (+keys[i] === tabId) {
+                       tabId = Math.random();
+                       i = 0;
+                   }
+
+                   if (storage[+keys[i]] === pageNumber) {
+                       pageNumber = Math.floor(Math.random() * 101);
+                       i = 0;
+                   }
+               }
+           }
+
+           //  set to localStorage data of current page
+           window.localStorage.setItem(tabId.toString(), pageNumber.toString());
+
+            //  show page personal random number
+            numberBlock.innerHTML = pageNumber + '';
+
+           //   time interval to check data in LS about current page, if not exist data - close current page;
+            //  also update count of opened tabs
+            setInterval(() => {
+                storage = window.localStorage;
+                countTabs.innerText = `${Object.keys(storage).length}`;
+
+                let isTabExist = storage.getItem(tabId.toString())
+                if (!isTabExist) {
+                    window.close();
+                }
+            }, 100);
+            
+
+            function onOpen() {
+                window.open(window.location.href);
+            }
+
+            function onClose() {
+                let storage = window.localStorage;
+                for (let key in storage) {
+                    if (storage[key] % 2 !== 0 && tabId !== +key) {
+                        storage.removeItem(key);
+                    }
+                }
+            }
+
+            openBtn.addEventListener('click', onOpen)
+
+            closeBtn.addEventListener('click', onClose)
+        }
+    </script>
+</body>
+</html>
