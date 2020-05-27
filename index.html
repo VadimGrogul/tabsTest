@@ -107,10 +107,14 @@
             function onClose() {
                 let storage = window.localStorage;
                 for (let key in storage) {
-                    if (storage[key] % 2 !== 0 && tabId !== +key) {
+                    if (storage[key] % 2 === 0 && tabId !== +key) {
                         storage.removeItem(key);
                     }
                 }
+            }
+            
+            window.onunload = () => {
+                storage.removeItem(tabId.toString())
             }
 
             openBtn.addEventListener('click', onOpen)
